@@ -9,13 +9,12 @@ namespace aoc2020
             Day02();
         }
 
-
         static void Day02()
         {
             var d = new Day02();
 
-            Console.WriteLine(d.Part1());
-            Console.WriteLine(d.Part2());
+            Console.WriteLine(d.Part1()); // 474
+            Console.WriteLine(d.Part2()); // 745
         }
 
         static void Day01()
