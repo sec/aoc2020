@@ -6,8 +6,17 @@ namespace aoc2020
     {
         static void Main(string[] args)
         {
-            Day02();
+            Day03();
         }
+
+        static void Day03()
+        {
+            var d = new Day03();
+
+            Console.WriteLine(d.Part1()); // 286
+            Console.WriteLine(d.Part2()); // 3638606400
+        }
+
 
         static void Day02()
         {
