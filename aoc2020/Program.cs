@@ -22,17 +22,8 @@ namespace aoc2020
             var c = (IDay) Activator.CreateInstance(t);
 
             Console.WriteLine($"Running Day{day:d2}...");
-
             Console.WriteLine($"Part 1: {c.Part1()}");
             Console.WriteLine($"Part 2: {c.Part2()}");
-        }
-
-        static void Day01()
-        {
-            var d = new Day01();
-
-            Console.WriteLine(d.Part1()); // 
-            Console.WriteLine(d.Part2()); // 
         }
     }
 }
