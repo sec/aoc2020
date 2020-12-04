@@ -5,7 +5,11 @@ using System.Text.RegularExpressions;
 
 namespace aoc2020
 {
-    class Day04
+    /// <summary>
+    /// P1 - 210
+    /// P2 - 131
+    /// </summary>
+    public class Day04 : IDay
     {
         class Passport
         {
@@ -106,8 +110,8 @@ namespace aoc2020
             }
         }
 
-        internal object Part1() => _passports.Count(x => x.IsValid(false));
+        public object Part1() => _passports.Count(x => x.IsValid(false));
 
-        internal object Part2() => _passports.Count(x => x.IsValid(true));
+        public object Part2() => _passports.Count(x => x.IsValid(true));
     }
 }

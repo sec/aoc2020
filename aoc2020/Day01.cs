@@ -4,7 +4,11 @@ using System.Linq;
 
 namespace aoc2020
 {
-    public class Day01
+    /// <summary>
+    /// 145875
+    /// 69596112
+    /// </summary>
+    public class Day01 : IDay
     {
         private readonly List<int> _list;
 
@@ -16,7 +20,7 @@ namespace aoc2020
                 .ToList();
         }
 
-        internal int Part1()
+        public object Part1()
         {
             for (int i = 0; i < _list.Count; i++)
             {
@@ -38,7 +42,7 @@ namespace aoc2020
             throw new InvalidProgramException();
         }
 
-        internal int Part2()
+        public object Part2()
         {
             for (int i = 0; i < _list.Count; i++)
             {

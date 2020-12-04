@@ -4,7 +4,11 @@ using System.Linq;
 
 namespace aoc2020
 {
-    public class Day03
+    /// <summary>
+    /// 286
+    /// 3638606400
+    /// </summary>
+    public class Day03 : IDay
     {
         private readonly List<string> _map;
 
@@ -34,8 +38,8 @@ namespace aoc2020
             return ans;
         }
 
-        internal object Part1() => Count(3, 1);
+        public object Part1() => Count(3, 1);
 
-        internal object Part2() => Count(1, 1) * Count(3, 1) * Count(5, 1) * Count(7, 1) * Count(1, 2);
+        public object Part2() => Count(1, 1) * Count(3, 1) * Count(5, 1) * Count(7, 1) * Count(1, 2);
     }
 }

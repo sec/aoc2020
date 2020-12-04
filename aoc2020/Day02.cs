@@ -4,7 +4,11 @@ using System.Linq;
 
 namespace aoc2020
 {
-    public class Day02
+    /// <summary>
+    /// 474
+    /// 745
+    /// </summary>
+    public class Day02 : IDay
     {
         class Password
         {
@@ -51,8 +55,8 @@ namespace aoc2020
                 .Select(x => new Password(x)).ToList();
         }
 
-        internal object Part1() => _passwd.Count(x => x.IsValid());
+        public object Part1() => _passwd.Count(x => x.IsValid());
 
-        internal object Part2() => _passwd.Count(x => x.IsValidRange());
+        public object Part2() => _passwd.Count(x => x.IsValidRange());
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 
 namespace aoc2020
 {
@@ -6,39 +8,31 @@ namespace aoc2020
     {
         static void Main(string[] args)
         {
-            Day04();
-        }
+            var day = DateTime.Now.Day;
+            if (args.Length == 1)
+            {
+                day = int.Parse(args[0]);
+            }
 
-        static void Day04()
-        {
-            var d = new Day04();
+            var t = Assembly.GetExecutingAssembly()
+                .GetTypes()
+                .Where(x => x.Name == $"Day{day:d2}")
+                .Single();
 
-            Console.WriteLine(d.Part1()); // 210
-            Console.WriteLine(d.Part2()); // 131
-        }
+            var c = (IDay) Activator.CreateInstance(t);
 
-        static void Day03()
-        {
-            var d = new Day03();
+            Console.WriteLine($"Running Day{day:d2}...");
 
-            Console.WriteLine(d.Part1()); // 286
-            Console.WriteLine(d.Part2()); // 3638606400
-        }
-
-        static void Day02()
-        {
-            var d = new Day02();
-
-            Console.WriteLine(d.Part1()); // 474
-            Console.WriteLine(d.Part2()); // 745
+            Console.WriteLine($"Part 1: {c.Part1()}");
+            Console.WriteLine($"Part 2: {c.Part2()}");
         }
 
         static void Day01()
         {
             var d = new Day01();
 
-            Console.WriteLine(d.Part1()); // 145875
-            Console.WriteLine(d.Part2()); // 69596112
+            Console.WriteLine(d.Part1()); // 
+            Console.WriteLine(d.Part2()); // 
         }
     }
 }
