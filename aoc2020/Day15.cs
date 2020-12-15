@@ -4,6 +4,10 @@ using System.Linq;
 
 namespace aoc2020
 {
+    /// <summary>
+    /// Part 1: 1194
+    /// Part 2: 48710
+    /// </summary>
     public class Day15 : IDay
     {
         int Say(int howMuch)
