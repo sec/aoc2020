@@ -6,6 +6,7 @@ namespace aoc2020
 {
     /// <summary>
     /// Part 1: 66020135789767
+    /// Part 2: 1537
     /// </summary>
     public class Day20 : IDay
     {
@@ -44,7 +45,7 @@ namespace aoc2020
 
         class Tile
         {
-            const int SIZE = 10;
+            public const int SIZE = 10;
 
             public bool[,] Map = new bool[SIZE, SIZE];
             public long Id;
@@ -95,11 +96,14 @@ namespace aoc2020
 
             internal bool RightSideWithLeft(Tile tile)
             {
-                for (int i = 0; i < SIZE; i++)
+                if (tile != null)
                 {
-                    if (Map[i, SIZE - 1] != tile.Map[i, 0])
+                    for (int i = 0; i < SIZE; i++)
                     {
-                        return false;
+                        if (Map[i, SIZE - 1] != tile.Map[i, 0])
+                        {
+                            return false;
+                        }
                     }
                 }
                 return true;
@@ -107,11 +111,14 @@ namespace aoc2020
 
             internal bool LeftSideWithRight(Tile tile)
             {
-                for (int i = 0; i < SIZE; i++)
+                if (tile != null)
                 {
-                    if (Map[i, 0] != tile.Map[i, SIZE - 1])
+                    for (int i = 0; i < SIZE; i++)
                     {
-                        return false;
+                        if (Map[i, 0] != tile.Map[i, SIZE - 1])
+                        {
+                            return false;
+                        }
                     }
                 }
                 return true;
@@ -119,11 +126,14 @@ namespace aoc2020
 
             internal bool UpSideWithBottom(Tile tile)
             {
-                for (int i = 0; i < SIZE; i++)
+                if (tile != null)
                 {
-                    if (Map[0, i] != tile.Map[SIZE - 1, i])
+                    for (int i = 0; i < SIZE; i++)
                     {
-                        return false;
+                        if (Map[0, i] != tile.Map[SIZE - 1, i])
+                        {
+                            return false;
+                        }
                     }
                 }
                 return true;
@@ -131,11 +141,14 @@ namespace aoc2020
 
             internal bool BottomSideWithUp(Tile tile)
             {
-                for (int i = 0; i < SIZE; i++)
+                if (tile != null)
                 {
-                    if (Map[SIZE - 1, i] != tile.Map[0, i])
+                    for (int i = 0; i < SIZE; i++)
                     {
-                        return false;
+                        if (Map[SIZE - 1, i] != tile.Map[0, i])
+                        {
+                            return false;
+                        }
                     }
                 }
                 return true;
@@ -176,29 +189,21 @@ namespace aoc2020
 
         class Image
         {
+            readonly bool[][] _monster = new[]
+            {
+                "                  #".Select(x => x == '#').ToArray(),
+                "#    ##    ##    ###".Select(x => x == '#').ToArray(),
+                " #  #  #  #  #  #".Select(x => x == '#').ToArray()
+            };
+
             readonly Tile[,] _map;
             readonly int _n;
 
-            public Image(int n, byte[] input)
+            public Image(int n, Tile first)
             {
                 _n = n;
                 _map = new Tile[n, n];
-
-                int index = 0;
-
-                for (int y = 0; y < n; y++)
-                {
-                    for (int x = 0; x < n; x++)
-                    {
-                        var src = _tileMap[input[index]];
-                        var variant = input[index + 1];
-                        var key = (src.Id, variant);
-
-                        _map[y, x] = _tileCache[key];
-
-                        index += 2;
-                    }
-                }
+                _map[0, 0] = first;
             }
 
             public bool IsValid()
@@ -207,6 +212,11 @@ namespace aoc2020
                 {
                     for (int x = 0; x < _n; x++)
                     {
+                        if (_map[y, x] == null)
+                        {
+                            continue;
+                        }
+
                         if (x + 1 < _n)
                         {
                             if (!_map[y, x].RightSideWithLeft(_map[y, x + 1]))
@@ -244,9 +254,137 @@ namespace aoc2020
                 return true;
             }
 
-            public long CRC()
+            internal IEnumerable<long> UsedIds()
             {
-                return _map[0, 0].Id * _map[0, _n - 1].Id * _map[_n - 1, 0].Id * _map[_n - 1, _n - 1].Id;
+                for (int y = 0; y < _n; y++)
+                {
+                    for (int x = 0; x < _n; x++)
+                    {
+                        if (_map[y, x] != null)
+                        {
+                            yield return _map[y, x].Id;
+                        }
+                    }
+                }
+            }
+
+            internal bool Solve()
+            {
+                for (int y = 0; y < _n; y++)
+                {
+                    for (int x = 0; x < _n; x++)
+                    {
+                        if (x == 0 && y == 0)
+                        {
+                            continue;
+                        }
+
+                        var next = _tileCache.Where(x => !UsedIds().Contains(x.Key.Item1)).ToList();
+                        var found = false;
+                        foreach (var n in next)
+                        {
+                            _map[y, x] = n.Value;
+                            if (IsValid())
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (!found)
+                        {
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
+            }
+
+            private bool[,] GetMap()
+            {
+                var newsize = Tile.SIZE - 2;
+                var map = new bool[_n * newsize, _n * newsize];
+
+                for (int y = 0; y < _n; y++)
+                {
+                    for (int x = 0; x < _n; x++)
+                    {
+                        var tile = _map[y, x];
+
+                        for (int j = 0; j < newsize; j++)
+                        {
+                            for (int i = 0; i < newsize; i++)
+                            {
+                                map[y * newsize + j, x * newsize + i] = tile.Map[j + 1, i + 1];
+                            }
+                        }
+                    }
+                }
+
+                return map;
+            }
+
+            public int RemoveMonstersAndCountWaters()
+            {
+                var map = GetMap();
+                var monsters = false;
+                var newsize = map.GetLength(0);
+
+                for (int y = 0; y < newsize; y++)
+                {
+                    for (int x = 0; x < newsize; x++)
+                    {
+                        var found = true;
+                        for (int j = 0; j < 3 && found; j++)
+                        {
+                            for (int i = 0; i < _monster[j].Length && found; i++)
+                            {
+                                if (y + j >= newsize || x + i >= newsize)
+                                {
+                                    found = false;
+                                }
+                                else if (_monster[j][i] && !map[y + j, x + i])
+                                {
+                                    found = false;
+                                }
+                            }
+                        }
+
+                        if (found)
+                        {
+                            monsters = true;
+                            for (int j = 0; j < 3; j++)
+                            {
+                                for (int i = 0; i < _monster[j].Length; i++)
+                                {
+                                    if (_monster[j][i])
+                                    {
+                                        map[y + j, x + i] = false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (monsters)
+                {
+                    int count = 0;
+                    for (int y = 0; y < newsize; y++)
+                    {
+                        for (int x = 0; x < newsize; x++)
+                        {
+                            if (map[y, x])
+                            {
+                                count++;
+                            }
+                        }
+                    }
+                    return count;
+                }
+
+                return 0;
             }
         }
 
@@ -261,6 +399,7 @@ namespace aoc2020
             foreach (var kv in _tileMap)
             {
                 var tiles = _tileCache.Where(x => x.Key.Item1 == kv.Value.Id).Select(x => x.Value).ToList();
+
                 foreach (var tile in tiles)
                 {
                     foreach (var next in _tileCache)
@@ -269,42 +408,39 @@ namespace aoc2020
                         {
                             continue;
                         }
-                        var i = 0;
 
-                        if (tile.LeftSideWithRight(next.Value)) i++;
-                        if (tile.RightSideWithLeft(next.Value)) i++;
-                        if (tile.UpSideWithBottom(next.Value)) i++;
-                        if (tile.BottomSideWithUp(next.Value)) i++;
-
-                        counts[tile.Id] += i;
+                        counts[tile.Id] += tile.LeftSideWithRight(next.Value) ? 1 : 0;
+                        counts[tile.Id] += tile.RightSideWithLeft(next.Value) ? 1 : 0;
+                        counts[tile.Id] += tile.UpSideWithBottom(next.Value) ? 1 : 0;
+                        counts[tile.Id] += tile.BottomSideWithUp(next.Value) ? 1 : 0;
                     }
                 }
             }
 
-            var min = counts.Values.Min();
-            _corners = counts.Where(x => x.Value == min).Select(x => x.Key).ToList();
-            
-            return _corners.Aggregate(1L, (a, b) => a * b);            
+            _corners = counts.Where(x => x.Value == 16).Select(x => x.Key).ToList();
+
+            return _corners.Aggregate(1L, (a, b) => a * b);
         }
 
         public object Part2()
         {
-            var corners = new[] { 1951, 1171, 2971, 3079 };
+            int i = 0;
 
-            return 0;
-        }
-
-        void Print<T>(T[,] src)
-        {
-            for (int y = 0; y < src.GetLength(0); y++)
+            foreach (var corner in _corners)
             {
-                for (int x = 0; x < src.GetLength(0); x++)
+                var tiles = _tileCache.Where(x => x.Key.Item1 == corner).Select(x => x.Value);
+
+                foreach (var tile in tiles)
                 {
-                    Console.Write(src[y, x]);
+                    var image = new Image(_size, tile);
+                    if (image.Solve())
+                    {
+                        i += image.RemoveMonstersAndCountWaters();
+                    }
                 }
-                Console.WriteLine();
             }
-            Console.WriteLine();
+
+            return i;
         }
     }
 }
