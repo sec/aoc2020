@@ -27,7 +27,7 @@ namespace aoc2020
                     var d = line.Split(": ");
                     var index = int.Parse(d[0]);
 
-                    _rules[index] = d[1].StartsWith('"') ? d[1][1].ToString() : $"({d[1]})";
+                    _rules[index] = $"({d[1].Trim('"')})";
                 }
                 else
                 {

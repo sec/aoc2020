@@ -14,6 +14,7 @@ namespace aoc2020
 
         readonly Random _random = new Random();
         readonly int _size;
+        List<long> _corners;
 
         public Day20()
         {
@@ -281,10 +282,9 @@ namespace aoc2020
             }
 
             var min = counts.Values.Min();
-            var edge = counts.Where(x => x.Value == min).Select(x => x.Key);
-            var ans = edge.Aggregate(1L, (a, b) => a * b);
-
-            return ans;
+            _corners = counts.Where(x => x.Value == min).Select(x => x.Key).ToList();
+            
+            return _corners.Aggregate(1L, (a, b) => a * b);            
         }
 
         public object Part2()
