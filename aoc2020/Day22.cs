@@ -1,30 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 
 namespace aoc2020
 {
     /// <summary>
     /// Part 1: 32489
+    /// Part 2: 35676
     /// </summary>
     public class Day22 : IDay
     {
-        private readonly Queue<int> _player;
-        private readonly Queue<int> _crab;
+        private readonly Queue<int> _deck1;
+        private readonly Queue<int> _deck2;
 
         public Day22()
         {
-            _player = new Queue<int>();
-            _crab = new Queue<int>();
+            _deck1 = new Queue<int>();
+            _deck2 = new Queue<int>();
+        }
 
-            var current = _player;
+        void Reset()
+        {
+            _deck1.Clear();
+            _deck2.Clear();
+
+            var current = _deck1;
 
             foreach (var line in Inputs.Day22.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries))
             {
                 if (line == "Player 2:")
                 {
-                    current = _crab;
+                    current = _deck2;
                 }
                 else if (int.TryParse(line, out var d))
                 {
@@ -33,33 +39,68 @@ namespace aoc2020
             }
         }
 
-        public object Part1()
+        long Combat(bool partTwo)
         {
-            while (_player.Count > 0 && _crab.Count > 0)
-            {
-                var player = _player.Dequeue();
-                var crab = _crab.Dequeue();
+            Reset();
 
-                if (player > crab)
-                {
-                    _player.Enqueue(player);
-                    _player.Enqueue(crab);
-                }
-                else
-                {
-                    _crab.Enqueue(crab);
-                    _crab.Enqueue(player);
-                }
-            }
-
-            var winner = _crab.Count > 0 ? _crab : _player;
+            var playerWins = Play(partTwo ? 1 : 0, _deck1, _deck2);
+            var winner = playerWins ? _deck1 : _deck2;
 
             return winner.Select((v, i) => v * (winner.Count - i)).Sum();
         }
 
-        public object Part2()
+        bool Play(int game, Queue<int> player, Queue<int> crab)
         {
-            return 0;
+            var check = new HashSet<string>();
+
+            while (player.Count > 0 && crab.Count > 0)
+            {
+                if (game > 0)
+                {
+                    foreach (var deck in new[] { player, crab })
+                    {
+                        var order = string.Join(",", deck);
+                        if (check.Contains(order))
+                        {
+                            return true;
+                        }
+                        check.Add(order);
+                    }
+                }
+
+                var playerCard = player.Dequeue();
+                var crabCard = crab.Dequeue();
+
+                var playerWins = playerCard > crabCard;
+
+                if (game > 0)
+                {
+                    if (player.Count >= playerCard && crab.Count >= crabCard)
+                    {
+                        var newPlayer = new Queue<int>(player.Take(playerCard));
+                        var newCrab = new Queue<int>(crab.Take(crabCard));
+
+                        playerWins = Play(game + 1, newPlayer, newCrab);
+                    }
+                }
+
+                if (playerWins)
+                {
+                    player.Enqueue(playerCard);
+                    player.Enqueue(crabCard);
+                }
+                else
+                {
+                    crab.Enqueue(crabCard);
+                    crab.Enqueue(playerCard);
+                }
+            }
+
+            return player.Count > 0;
         }
+
+        public object Part1() => Combat(false);
+
+        public object Part2() => Combat(true);
     }
 }
